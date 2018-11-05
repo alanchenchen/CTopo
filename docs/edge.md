@@ -2,8 +2,8 @@
 
 | key  |      description                         |required| default |
 |:-----------:|:----------------------------------------:|:------:|:-------:|
-| from | `[Number] | [String]`起始节点的id          |   yes   |  /  |
-| to | `[Number] | [String]`终止节点的id |   yes   |  /   |
+| from | `[Number]或[String]`起始节点的id          |   yes   |  /  |
+| to | `[Number]或[String]`终止节点的id |   yes   |  /   |
 | title | `[String]`连线名称，会一直显示 |   no   |  ''  |
 | tips | `[String]`连线名称，只有hover才会显示，会覆盖掉title       |   no   |  ''  |
 | style | `[Object]`连线的样式设置，具体配置见下方|   no   |  {}  |

@@ -2,7 +2,7 @@
 
 | key  |      description                         |required| default |
 |:-----------:|:----------------------------------------:|:------:|:-------:|
-| id | `[Number] | [String]`节点唯一标识          |   yes   |  /  |
+| id | `[Number]或[String]`节点唯一标识          |   yes   |  /  |
 | x | `[Number]`节点的x坐标,不填会随机生成一个在canvas容器范围内的值 |   no   |  随机数   |
 | y | `[Number]`节点的y坐标,不填会随机生成一个在canvas容器范围内的值 |   no   |  随机数  |
 | label | `[String]`节点名称       |   no   |  ''  |
@@ -43,7 +43,7 @@
 | key  |      description                         |required| default |
 |:-----------:|:----------------------------------------:|:------:|:-------:|
 | rotate | `[Number]`节点旋转角度|   no   |  0  |
-| scale | `[Number] | [Array]`节点缩放, 默认不缩放，参数若为数字，表示x和y缩放一致，若为数组，分别表示x和y方向缩放 |   no   |  1  |
+| scale | `[Number]或[Array]`节点缩放, 默认不缩放，参数若为数字，表示x和y缩放一致，若为数组，分别表示x和y方向缩放 |   no   |  1  |
 
 *alarm*
 
