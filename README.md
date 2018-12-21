@@ -1,4 +1,9 @@
 # CTopo
+
+![](https://img.shields.io/npm/v/ctopo.svg)
+![](https://img.shields.io/npm/dt/ctopo.svg)
+![](https://img.shields.io/github/license/alanchenchen/CTopo.svg)
+
 > 基于JTopo完全二次封装，模仿vis库的network模块的api使用方法，实现topo图更加简单
 
 > version:  0.0.3
