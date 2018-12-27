@@ -2,10 +2,10 @@
  * @name Topo图插件二次封装，基于JTopo 0.4.8
  * @description 完全封装JTopo基础api，解决鼠标cursor报错和滚轮缩放方向bug，修改源码中callee，现支持es5严格格式不报错
  * @author Alan Chen
- * @version 2018/9/17
+ * @version 2018/12/27
  * 
  * @constructor 
- * @param {slector|String} DOM 必选 构造函数接受一个参数，当前绑定topo的canvas类名或id名，与jq选择器一致,必须是canvas标签
+ * @param {selector|String} DOM 必选 构造函数接受一个参数，当前绑定topo的canvas类名或id名，与jq选择器一致,必须是canvas标签
  * @instance  实例方法
  * @method setData(dataset) 设置topo图的节点、连线和节点组等数据 
  *       dataset包含3个可选键  nodes(Array)节点  edges(Array)连线 containers(Array)节点组 
@@ -70,6 +70,16 @@
  *              eagleEye (Boolean)--控制鹰眼的显示。默认为false，关闭鹰眼
  *              disableWheelZoom (Boolean)--是否禁用滚轮缩放整个画布。默认为false，可以滚轮缩放
  * 
+ * @method update(dataset) 更新topo图的节点、连线等数据
+ *      dataset包含2个可选键  nodes(Array)节点  edges(Array)连线
+ *      
+ *      nodes 数组项为对象，必选id(已有节点的唯一标识)
+ *            可选键：同setData()中nodes的可选键，除了没有image，shape和group，其余完全一致
+ *      
+ *      edges 数组项为对象，必选id(已有连线的唯一标识，插件自己生成)
+ *            可选键：同setData()中edges的可选键完全一致
+ *              
+ * 
  * @method getPosition() 获取当前所有节点的位置信息 return一个数组。
  * 
  * @method setPosition(positions) 设置对应id的节点坐标位置。
@@ -114,6 +124,10 @@ class Topo {
         this.scene = new JTopo.Scene(this.stage)
     }
     setNodeConfig(node, config) {
+        //node节点文本
+        if(config.label) {
+            node.text = config.label
+        }
         //node节点颜色
         if(config.color) {
             node.fillColor = config.color
@@ -190,7 +204,9 @@ class Topo {
             }
             else{
                 node = new JTopo.Node(item.label)
-                if(item.size) node.setSize(...item.size)	
+                if(item.size) {
+                    node.setSize(...item.size)	
+                }
             }
             node.fontColor = '0,0,0' //所有node默认字体为黑色
             this.setNodeConfig(node, item)
@@ -205,7 +221,7 @@ class Topo {
         this.nodes = this.scene.childs.filter(child => child.elementType == 'node')
 
         //edge连线
-        edges && edges.forEach( item => {
+        edges && edges.forEach((item, index) => {
             const fromNode = this.nodes.find(child => item.from !=undefined &&child.data.id == item.from)
             const toNode = this.nodes.find(child => item.to !=undefined && child.data.id == item.to)
             //将连线的两个节点排序，永远使from的_index小于to的_index。避免相反方向连线重叠！
@@ -227,11 +243,16 @@ class Topo {
                     })
                 }
                 link.arrowsRadius = item.style && item.style.arrow
-                if(item.style && item.style.color)link.strokeColor = item.style.color
+                if(item.style && item.style.color) {
+                    link.strokeColor = item.style.color
+                }
                 link.fontColor = (item.style && item.style.fontColor) || '0,0,0'
                 link.dashedPattern = item.style && item.style.dashed
                 
                 link.data = item
+                // 生成一个不会重复的值作为link的唯一id
+                // link.data.id = link._id
+                link.data.id = Symbol(index)
                 this.scene.add(link)
             }
         })
@@ -285,6 +306,68 @@ class Topo {
                                ? false
                                : 0.85 //默认开启滚轮缩放
 
+    }
+    update({nodes, edges}) {
+        //ndoe节点
+        nodes && nodes.forEach( item => {
+            let targetNode = this.nodes.find(child => child.data.id == item.id)   
+            if(Boolean(targetNode)) {
+                this.setNodeConfig(targetNode, item)
+                if(item.x && item.y) {
+                    targetNode.setLocation(item.x, item.y)
+                }
+                if(item.size) {
+                    targetNode.setSize(...item.size)
+                }
+                
+                // 合并额外传入的值data
+                targetNode.data = {...targetNode.data, ...item}
+            }
+            else {
+                console.warn(`没有对应id为${item.id}的节点，所以无法更新`)
+            }       
+        })
+
+        //edge连线
+        edges && edges.forEach( item => {
+            let targetLink = this.edges.find(child => child.data.id == item.id)
+            if(Boolean(targetLink)) {
+                if(item.label) {
+                    targetLink.text = String(item.label)
+                }
+                if(item.tips) { //tips显示文本，hover效果，会覆盖掉label
+                    targetLink.removeEventListener('mouseover')
+                    targetLink.removeEventListener('mouseout')
+                    targetLink.mouseover(() =>{
+                        targetLink.text = String(item.tips)
+                    })
+                    targetLink.mouseout(() =>{
+                        targetLink.text = ''
+                    })
+                }
+                
+                if(item.style) {
+                    if(item.style.color) {
+                        targetLink.strokeColor = item.style.color
+                    }
+                    if(item.style.fontColor) {
+                        targetLink.fontColor = item.style.fontColor
+                    }
+                    if(item.style.arrow) {
+                        targetLink.arrowsRadius = item.style.arrow
+                    }
+                    if(item.style.dashed) {
+                        targetLink.dashedPattern = item.style.dashed
+                    }
+                }
+                
+                // 合并额外传入的值data
+                targetLink.data = {...targetLink.data, ...item}
+            }
+            else {
+                console.warn(`没有对应id为${item.id}的连线，所以无法更新`)
+            }
+        })
     }
     eventHandler(name, cb, flag) {
         const eventHandler = {
