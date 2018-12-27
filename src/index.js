@@ -70,15 +70,30 @@
  *              eagleEye (Boolean)--控制鹰眼的显示。默认为false，关闭鹰眼
  *              disableWheelZoom (Boolean)--是否禁用滚轮缩放整个画布。默认为false，可以滚轮缩放
  * 
- * @method update(dataset) 更新topo图的节点、连线等数据
+ * @method update(dataset) 更新topo图的节点和连线等数据
  *      dataset包含2个可选键  nodes(Array)节点  edges(Array)连线
  *      
- *      nodes 数组项为对象，必选id(已有节点的唯一标识)
+ *      nodes 数组项为对象
+ *            必选id(String或Number类型)。id为node创建时手动传入
  *            可选键：同setData()中nodes的可选键，除了没有image，shape和group，其余完全一致
  *      
- *      edges 数组项为对象，必选id(已有连线的唯一标识，插件自己生成)
+ *      edges 数组项为对象
+ *            必选id(Symbol类型)
+ *                  id为edge创建时插件生成。由于Symbol的唯一性，所以edge的id只能从监听事件返回参数中获取(target.data.id)
  *            可选键：同setData()中edges的可选键完全一致
- *              
+ * 
+ * @method add(dataset) 添加一个或多个topo图的节点、连线和节点组等数据    
+ *      dataset包含3个可选键  nodes(Array)节点  edges(Array)连线 containers(Array)节点组
+ *      注：参数和用法与setData()完全一致
+ * 
+ * @method remove(dataset) 删除一个或多个topo图的节点和连线等数据 
+ *      dataset包含2个可选键  nodes(Array)节点  edges(Array)连线    
+ *          nodes的数组项为String或Number类型，只有一个值，为node创建时手动传入的id
+ *          edges的数组项为Symbol类型，为edge创建时插件生成的id。由于Symbol的唯一性，所以edge的id只能从监听事件返回参数中获取(target.data.id)
+ *      例：remove({
+ *              nodes: ['1', '2'],
+ *              edges: [Symbol(0), Symbol(1)]
+ *          })
  * 
  * @method getPosition() 获取当前所有节点的位置信息 return一个数组。
  * 
@@ -148,7 +163,7 @@ class Topo {
         //node节点边框
         if(config.border) {
             //边框宽度
-            if(config.border.width) node.boderWidth = config.border.width
+            if(config.border.width) node.borderWidth = config.border.width
             //边框弧度
             if(config.border.radius) node.borderRadius = config.border.radius
              //边框颜色
@@ -180,8 +195,10 @@ class Topo {
         node.selected = config.selected || false	
         node.editAble = config.editable || false
     }
-    setData({nodes, edges, containers}) {
-        this.scene.clear() //每次先清除画布，避免数据重复
+    setData({nodes, edges, containers}, clear=true) {
+        if(Boolean(clear)) {
+            this.scene.clear() //每次先清除画布，避免数据重复
+        }
         //ndoe节点
         nodes && nodes.forEach( (item, index) => {
             let node
@@ -369,6 +386,32 @@ class Topo {
             }
         })
     }
+    add({nodes, edges, containers}) {
+        this.setData({nodes, edges, containers}, false)
+    }
+    remove({nodes, edges}) {
+        //ndoe节点
+        nodes && nodes.forEach( item => {
+            let targetNode = this.nodes.find(child => child.data.id == item.id)   
+            if(Boolean(targetNode)) {
+                this.scene.remove(targetNode)
+            }
+            else {
+                console.warn(`没有对应id为${item.id}的节点，所以无法删除`)
+            }       
+        })
+
+        //edge连线
+        edges && edges.forEach( item => {
+            let targetLink = this.edges.find(child => child.data.id == item.id)
+            if(Boolean(targetLink)) {
+                this.scene.remove(targetLink)
+            }
+            else {
+                console.warn(`没有对应id为${item.id}的连线，所以无法删除`)
+            }
+        })
+    }
     eventHandler(name, cb, flag) {
         const eventHandler = {
             // tag是JTopo封装的事件名，raw是js原生事件名
@@ -401,7 +444,7 @@ class Topo {
 
         if(targetEvent) {
             if(flag) {//绑定事件
-                this.eventLoop.push(targetEvent)
+                this.eventLoop.push(name)
 
                 let preNodesLocations = null
                 this.scene.addEventListener('mousedown', e => {
@@ -439,7 +482,7 @@ class Topo {
             }
             else { //解绑事件
                 this.scene.removeEventListener(targetEvent)
-                const index = this.eventLoop.findIndex(a => a == targetEvent)
+                const index = this.eventLoop.findIndex(a => a == name)
                 this.eventLoop.splice(index, 1)
             }
         }
@@ -477,4 +520,5 @@ class Topo {
         })
     }
 }
+
 export default Topo

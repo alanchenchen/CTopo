@@ -6,7 +6,7 @@
 
 > 基于JTopo完全二次封装，模仿vis库的network模块的api使用方法，实现topo图更加简单
 
-> version:  0.0.4
+> version:  0.0.5
 
 > Author:  Alan Chen
 
@@ -48,9 +48,22 @@
         > update只会更新对应id的节点或连线，不会重新刷新canvas。
         * nodes(Array)节点  同setData()中nodes的可选键，除了没有image，shape和group，其余完全一致  
         * edges(Array)连线  同setData()中edges的可选键完全一致
-    4. `getPosition` 获取当前所有节点的位置信息 return一个数组，无参数
-    5. `setPosition(positions)` 设置对应id的节点坐标位置。 positions为数组，数组项必须包含id、x和y3个键值。x和y必须是数字
-    6. `on(eventType, cb)` 绑定事件，有2个参数:
+        * node和edge的id建议从监听事件返回参数获取(target.data.id)。node的id是创建节点时开发者手动输入，而edge的id是插件自动生成(Symbol类型)
+    4.  `add(dataset)` 添加一个或多个topo图的节点、连线和节点组等数据。dataset是个对象，包含3个可选键  
+        > 参数和用法与`setData()`完全一致。
+    5.  `remove(dataset)` 删除一个或多个topo图的节点和连线等数据。dataset是个对象，包含2个可选键  
+        * nodes(Array)节点  nodes的数组项为String或Number类型，只有一个值，为node创建时手动传入的id
+        * edges(Array)连线  edges的数组项为Symbol类型，为edge创建时插件生成的id。由于Symbol的唯一性，所以edge的id只能从监听事件返回参数中获取(target.data.id)
+        * 例：
+            ```js
+                remove({
+                    nodes: ['1', '2'],
+                    edges: [Symbol(0), Symbol(1)]
+                })
+            ```
+    6. `getPosition()` 获取当前所有节点的位置信息 return一个数组，无参数
+    7. `setPosition(positions)` 设置对应id的节点坐标位置。 positions为数组，数组项必须包含id、x和y3个键值。x和y必须是数字
+    8. `on(eventType, cb)` 绑定事件，有2个参数:
         * eventType目前支持
             * 'click'(单击)
             * 'dbclcik'(双击)
@@ -63,14 +76,14 @@
             * `canvas` --> 鼠标在canvas画布上的x和y坐标
             * `target` --> 鼠标当前选中的node或edge或container等数据，包含选中的所有canvas属性以及自定义传入的数据(挂载在data属性上)
             * `type` -->  当前选中的是哪种类型，如：node或link或container
-    7. `off(eventType)` 解绑定事件，只有一个参数, 参数和`on(eventType, cb)`第一个参数可选范围一致
+    9. `off(eventType)` 解绑定事件，只有一个参数, 参数和`on(eventType, cb)`第一个参数可选范围一致
    
 ## Attentions
 1. setOption必须在setData之后调用。setData可以连续调用，数据不会叠加，而setOption调用一次就会保存当前的配置
 2. dragEnd事件只有在鼠标移动后，发现node节点有位置移动才触发
 3. 可以在nodes或者edges的单个对象里传入别的数据，这些数据存在nodes或者edges实例的data属性里
 4. 本文档并没有写全JTopo里的所有api用法，例如，可以单独修改stage、node或者edge的属性。这些api需要开发者自行去百度JTopo。
-> 目前JTopo官网已访问不了，可以去百度文库查找，而且JTopo作者也没给出完善的文档，入坑需谨慎。
+> 目前JTopo作者也没给出完善的文档，入坑需谨慎。
 
 ## DEMO
 [代码](https://runjs.cn/code/s1ycvhqr)
