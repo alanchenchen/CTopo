@@ -392,7 +392,7 @@ class Topo {
     remove({nodes, edges}) {
         //ndoe节点
         nodes && nodes.forEach( item => {
-            let targetNode = this.nodes.find(child => child.data.id == item.id)   
+            let targetNode = this.nodes.find(child => child.data.id == item)   
             if(Boolean(targetNode)) {
                 this.scene.remove(targetNode)
             }
@@ -403,7 +403,7 @@ class Topo {
 
         //edge连线
         edges && edges.forEach( item => {
-            let targetLink = this.edges.find(child => child.data.id == item.id)
+            let targetLink = this.edges.find(child => child.data.id == item)
             if(Boolean(targetLink)) {
                 this.scene.remove(targetLink)
             }
