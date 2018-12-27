@@ -6,7 +6,7 @@
 
 > 基于JTopo完全二次封装，模仿vis库的network模块的api使用方法，实现topo图更加简单
 
-> version:  0.0.6
+> version:  0.0.7
 
 > Author:  Alan Chen
 

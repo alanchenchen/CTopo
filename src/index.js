@@ -139,40 +139,69 @@ class Topo {
         this.scene = new JTopo.Scene(this.stage)
     }
     setNodeConfig(node, config) {
+        const isValueExist = v => {
+            const type = typeof v
+            if(type == 'string') {
+                return v != ''
+            }
+            else if(type == 'number') {
+                return true
+            }
+            else if(type == 'undefined') {
+                return false
+            }
+            else if(type == 'object') {
+                return v === null? false: true
+            }
+        }
         //node节点文本
-        if(config.label) {
+        if(isValueExist(config.label)) {
             node.text = config.label
         }
         //node节点颜色
-        if(config.color) {
+        if(isValueExist(config.color)) {
             node.fillColor = config.color
         }
         //node节点透明度
-        if(config.opacity) {
+        if(isValueExist(config.opacity)) {
             node.alpha = config.opacity
         }
         //node节点内字体
-        if(config.font) {
+        if(isValueExist(config.font)) {
             //字体颜色
-            if(config.font.color) node.fontColor = config.font.color
+            if(isValueExist(config.font.color)) {
+                node.fontColor = config.font.color
+            }
             //字体大小和格式
-            if(config.font.size) node.font = config.font.size
+            if(isValueExist(config.font.size)) {
+                node.font = config.font.size
+            }
             //字体位置
-            if(config.font.position) node.textPosition = config.font.position + '_Center'
+            if(isValueExist(config.font.position)) {
+                node.textPosition = config.font.position + '_Center'
+            }
         }
         //node节点边框
-        if(config.border) {
+        if(isValueExist(config.border)) {
             //边框宽度
-            if(config.border.width) node.borderWidth = config.border.width
+            if(isValueExist(config.border.width)) {
+                node.borderWidth = config.border.width
+            }
             //边框弧度
-            if(config.border.radius) node.borderRadius = config.border.radius
+            if(isValueExist(config.border.radius)) {
+                node.borderRadius = config.border.radius
+            }
              //边框颜色
-            if(config.border.color) node.borderColor = config.border.color
+            if(isValueExist(config.border.color)) {
+                node.borderColor = config.border.color
+            }
         }
         //node节点形变
-        if(config.transform) {
+        if(isValueExist(config.transform)) {
             //z轴旋转
-            if(config.transform.rotate) node.rotate = config.transform.rotate
+            if(isValueExist(config.transform.rotate)) {
+                node.rotate = config.transform.rotate
+            }
             //x和y放向缩放
             if(typeof config.transform.scale == 'number') {
                 node.scaleX = config.transform.scale
@@ -184,10 +213,16 @@ class Topo {
             }
         }
         //node告警配置
-        if(config.alarm) {
-            if(config.alarm.name) node.alarm = config.alarm.name
-            if(config.alarm.color) node.alarmColor = config.alarm.color
-            if(config.alarm.opacity) node.alarmAlpha = config.alarm.opacity
+        if(isValueExist(config.alarm)) {
+            if(isValueExist(config.alarm.name)) {
+                node.alarm = config.alarm.name
+            }
+            if(isValueExist(config.alarm.color)) {
+                node.alarmColor = config.alarm.color
+            }
+            if(isValueExist(config.alarm.opacity)) {
+                node.alarmAlpha = config.alarm.opacity
+            }
         }
         //node的可配置性
         node.visible = config.visible == undefined?true:config.visible
