@@ -6,7 +6,7 @@
 
 > 基于JTopo完全二次封装，模仿vis库的network模块的api使用方法，实现topo图更加简单
 
-> version:  0.0.7
+> version:  0.0.9
 
 > Author:  Alan Chen
 
@@ -46,8 +46,8 @@
         * [config(Object)画布舞台的整体配置](./docs/config.md) 
     3.  `update(dataset)` 更新topo图的节点和连线数据。dataset是个对象，包含2个可选键  
         > update只会更新对应id的节点或连线，不会重新刷新canvas。
-        * nodes(Array)节点  同setData()中nodes的可选键，除了没有image，shape和group，其余完全一致  
-        * edges(Array)连线  同setData()中edges的可选键完全一致
+        * nodes(Array)节点, id必选  同setData()中nodes的可选键，除了没有image，shape和group，其余完全一致  
+        * edges(Array)连线, id必选  同setData()中edges的可选键完全一致
         * node和edge的id建议从监听事件返回参数获取(target.data.id)。node的id是创建节点时开发者手动输入，而edge的id是插件自动生成(Symbol类型)
     4.  `add(dataset)` 添加一个或多个topo图的节点、连线和节点组等数据。dataset是个对象，包含3个可选键  
         > 参数和用法与`setData()`完全一致。

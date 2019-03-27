@@ -2,7 +2,7 @@
  * @name Topo图插件二次封装，基于JTopo 0.4.8
  * @description 完全封装JTopo基础api，解决鼠标cursor报错和滚轮缩放方向bug，修改源码中callee，现支持es5严格格式不报错
  * @author Alan Chen
- * @version 2018/12/27
+ * @version 2019/3/26
  * 
  * @constructor 
  * @param {selector|String} DOM 必选 构造函数接受一个参数，当前绑定topo的canvas类名或id名，与jq选择器一致,必须是canvas标签
@@ -47,6 +47,7 @@
  *              tips (String)--连线名称，只有hover才会显示，会覆盖掉title
  *              style (Object)--连线的样式设置
  *                    arrow (Number)--箭头，默认为null，数字越大，箭头越大
+ *                    arrowEnabled (Boolean)--箭头方向是否正确显示
  *                    color (RGB)--连线颜色，默认为‘22,124,255’，必须为RGB格式的字符串
  *                    fontColor (RGB)--字体颜色，默认为‘0,0,0’，必须为RGB格式的字符串
  *                    dashed (Number)--箭头虚线的间隔，默认为0，数字越大，箭头虚线间隔越大
@@ -128,7 +129,8 @@
 import {JTopo} from'./JTopoCode'
 class Topo {
     constructor(DOM) {
-        this.version = `Based on JTopo-${JTopo.version}`
+        this.version = require('../package.json').version
+        this.baseVersion = `Based on JTopo-${JTopo.version}`
         this.eventLoop = []
         this.init(DOM)
     }
@@ -142,7 +144,7 @@ class Topo {
         const isValueExist = v => {
             const type = typeof v
             if(type == 'string') {
-                return v != ''
+                return true
             }
             else if(type == 'number') {
                 return true
@@ -278,8 +280,10 @@ class Topo {
             const toNode = this.nodes.find(child => item.to !=undefined && child.data.id == item.to)
             //将连线的两个节点排序，永远使from的_index小于to的_index。避免相反方向连线重叠！
             const sortNodes = [fromNode, toNode].sort((a,b) => a._index - b._index)
-            const source = sortNodes[0]
-            const destinate = sortNodes[1]
+            // 通过style.arrowEnabled来判断箭头方向是正确显示还是排序显示避免连线重叠
+            const isArrowRight = item.style && item.style.arrowEnabled
+            const source = isArrowRight? fromNode: sortNodes[0]
+            const destinate = isArrowRight? toNode: sortNodes[1]
             if(fromNode && toNode) {
                 let link = new JTopo.Link(source, destinate, item.title) 
                 link.bundleOffset = 35
@@ -384,10 +388,8 @@ class Topo {
         edges && edges.forEach( item => {
             let targetLink = this.edges.find(child => child.data.id == item.id)
             if(Boolean(targetLink)) {
-                if(item.label) {
-                    targetLink.text = String(item.label)
-                }
-                if(item.tips) { //tips显示文本，hover效果，会覆盖掉label
+                targetLink.text = String(item.title)
+                if(item.tips) { //tips显示文本，hover效果，会覆盖掉title
                     targetLink.removeEventListener('mouseover')
                     targetLink.removeEventListener('mouseout')
                     targetLink.mouseover(() =>{
