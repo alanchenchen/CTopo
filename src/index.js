@@ -2,7 +2,7 @@
  * @name Topo图插件二次封装，基于JTopo 0.4.8
  * @description 完全封装JTopo基础api，解决鼠标cursor报错和滚轮缩放方向bug，修改源码中callee，现支持es5严格格式不报错
  * @author Alan Chen
- * @version 2019/3/26
+ * @version 2019/3/27
  * 
  * @constructor 
  * @param {selector|String} DOM 必选 构造函数接受一个参数，当前绑定topo的canvas类名或id名，与jq选择器一致,必须是canvas标签
@@ -298,12 +298,12 @@ class Topo {
                         link.text = ''
                     })
                 }
-                link.arrowsRadius = item.style && item.style.arrow
-                if(item.style && item.style.color) {
+                if(item.style) {
+                    link.arrowsRadius = item.style.arrow
+                    link.dashedPattern = item.style.dashed
                     link.strokeColor = item.style.color
                 }
                 link.fontColor = (item.style && item.style.fontColor) || '0,0,0'
-                link.dashedPattern = item.style && item.style.dashed
                 
                 link.data = item
                 // 生成一个不会重复的值作为link的唯一id
@@ -407,10 +407,10 @@ class Topo {
                     if(item.style.fontColor) {
                         targetLink.fontColor = item.style.fontColor
                     }
-                    if(item.style.arrow) {
+                    if(typeof item.style.arrow == 'number' || item.style.arrow === null) {
                         targetLink.arrowsRadius = item.style.arrow
                     }
-                    if(item.style.dashed) {
+                    if(typeof item.style.dashed == 'number') {
                         targetLink.dashedPattern = item.style.dashed
                     }
                 }

@@ -17,5 +17,5 @@
 | color | `[RGB]`连线颜色，必须为RGB格式的字符串|   no   |  '22,124,255'  |
 | fontColor | `[RGB]`字体颜色，必须为RGB格式的字符串|   no   |  '0,0,0'  |
 | arrow | `[Number]`箭头,数字越大，箭头越大|   no   |  null  |
-| arrow | `[Number]`箭头方向是否正确显示|   no   |  false  |
+| arrowEnabled | `[Number]`箭头方向是否正确显示|   no   |  false  |
 | dashed | `[Number]`箭头虚线的间隔,数字越大，箭头虚线间隔越大|   no   |  0  |

@@ -1,6 +1,6 @@
 {
   "name": "ctopo",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "description": "A tool to show topo canvas with improved JTopo",
   "main": "dist/ctopo.js",
   "scripts": {
